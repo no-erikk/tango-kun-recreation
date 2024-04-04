@@ -7,8 +7,8 @@
         private int totalQuestions = 0;
         private int correctQuestions = 0;
 
-        // helper func - add 1 to totalQuestions and refresh UI
-        // ヘルパー関数 - totalQuestionsに1を追加し、UIをリフレッシュする
+        // helper func - add 1 the total number of questions and refresh UI
+        // ヘルパー関数 - に1を追加し、UIをリフレッシュする
         private void updateTotalQues()
         {
             totalQuestions++;
@@ -20,7 +20,7 @@
         private void updateCorrectAns()
         {
             correctQuestions++;
-            correctData.Text = correctQuestions.ToString(); 
+            correctData.Text = correctQuestions.ToString();
         }
 
         // helper func - calculate percentCorrect and refresh UI
@@ -38,22 +38,24 @@
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            
+
         }
 
         // submit answer button
         //「回答」を押すと
         private void button1_Click(object sender, EventArgs e)
         {
-            // test strings - will replace with index numbers when database is iplemented
+            // test strings - will replace with index numbers when database is implemented
             // テスト文字列 - データベースの実装時にインデックス番号に置き換える
             string question = questionBox.Text.ToUpper();
             string answer = answerBox.Text.ToUpper();
 
             // check if answer is not empty
             // 回答が空でないかチェックする
-            if (answer.Length > 0 )
-            {
+            if (answer.Length > 0)
+            {   
+                // if not empty
+                // 回答がからじゃないなら
                 if (question == answer)
                 {
                     // if correct
@@ -77,14 +79,15 @@
                 // アンサーボックスを消去
                 answerBox.Text = string.Empty;
 
-            } else 
+            }
+            else
             {
                 // if answer is empty show message box
-                // 答えが空ならメッセージボックスを表示
+                // 回答が空ならメッセージボックスを表示
                 MessageBox.Show("答えを入力してください。");
             }
 
-            
+
 
         }
         // reset button
