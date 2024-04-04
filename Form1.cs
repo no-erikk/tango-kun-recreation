@@ -24,7 +24,7 @@
         }
 
         // helper func - calculate percentCorrect and refresh UI
-        // ヘルパー関数 - パーセントコレクトを計算し、UIをリフレッシュする。
+        // ヘルパー関数 - percentCorrectを計算し、UIをリフレッシュする
         private void updatePercentCorrectAns()
         {
             double percentCorrect = (double)correctQuestions / totalQuestions * 100;
