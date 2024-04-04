@@ -8,15 +8,15 @@
         private int correctQuestions = 0;
 
         // helper func - add 1 the total number of questions and refresh UI
-        // ヘルパー関数 - に1を追加し、UIをリフレッシュする
+        // ヘルパー関数 - 質問総数に1を加え、UIをリフレッシュする
         private void updateTotalQues()
         {
             totalQuestions++;
             totalData.Text = totalQuestions.ToString();
         }
 
-        // helper func - add 1 to correctQuestions and refresh UI
-        // ヘルパー関数 - correctQuestionsに1を追加し、UIをリフレッシュする
+        // helper func - add 1 to the number of correct answers and refresh UI
+        // ヘルパー関数 - 正解数に1を加え、UIをリフレッシュする
         private void updateCorrectAns()
         {
             correctQuestions++;
@@ -28,7 +28,7 @@
         private void updatePercentCorrectAns()
         {
             double percentCorrect = (double)correctQuestions / totalQuestions * 100;
-            correctPercentData.Text = percentCorrect + "%";
+            correctPercentData.Text = Math.Round(percentCorrect, 2) + "%";
         }
 
         public mainWindow()
@@ -53,7 +53,7 @@
             // check if answer is not empty
             // 回答が空でないかチェックする
             if (answer.Length > 0)
-            {   
+            {
                 // if not empty
                 // 回答がからじゃないなら
                 if (question == answer)

@@ -118,7 +118,7 @@
             // totalData
             // 
             totalData.AutoSize = true;
-            totalData.Location = new Point(70, 117);
+            totalData.Location = new Point(75, 118);
             totalData.Name = "totalData";
             totalData.Size = new Size(0, 25);
             totalData.TabIndex = 8;
@@ -126,7 +126,7 @@
             // correctData
             // 
             correctData.AutoSize = true;
-            correctData.Location = new Point(70, 195);
+            correctData.Location = new Point(75, 196);
             correctData.Name = "correctData";
             correctData.Size = new Size(0, 25);
             correctData.TabIndex = 9;
@@ -134,7 +134,7 @@
             // correctPercentData
             // 
             correctPercentData.AutoSize = true;
-            correctPercentData.Location = new Point(70, 276);
+            correctPercentData.Location = new Point(75, 277);
             correctPercentData.Name = "correctPercentData";
             correctPercentData.Size = new Size(0, 25);
             correctPercentData.TabIndex = 10;
