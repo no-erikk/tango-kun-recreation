@@ -39,6 +39,7 @@
             totalData = new Label();
             correctData = new Label();
             correctPercentData = new Label();
+            startLabel = new Label();
             SuspendLayout();
             // 
             // submit
@@ -111,9 +112,8 @@
             questionBox.AutoSize = true;
             questionBox.Location = new Point(246, 125);
             questionBox.Name = "questionBox";
-            questionBox.Size = new Size(59, 25);
+            questionBox.Size = new Size(0, 25);
             questionBox.TabIndex = 7;
-            questionBox.Text = "label1";
             // 
             // totalData
             // 
@@ -139,12 +139,22 @@
             correctPercentData.Size = new Size(0, 25);
             correctPercentData.TabIndex = 10;
             // 
+            // startLabel
+            // 
+            startLabel.AutoSize = true;
+            startLabel.Location = new Point(339, 34);
+            startLabel.Name = "startLabel";
+            startLabel.Size = new Size(192, 25);
+            startLabel.TabIndex = 11;
+            startLabel.Text = "リセットをクリックして開始";
+            // 
             // mainWindow
             // 
             AcceptButton = submit;
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(813, 389);
+            Controls.Add(startLabel);
             Controls.Add(correctPercentData);
             Controls.Add(correctData);
             Controls.Add(totalData);
@@ -176,5 +186,6 @@
         private Label totalData;
         private Label correctData;
         private Label correctPercentData;
+        private Label startLabel;
     }
 }
