@@ -28,8 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            submit = new Button();
-            cancel = new Button();
+            submit_btn = new Button();
+            reset_btn = new Button();
             answerBox = new TextBox();
             totalLabel = new Label();
             correctLabel = new Label();
@@ -40,27 +40,30 @@
             correctData = new Label();
             correctPercentData = new Label();
             startLabel = new Label();
+            loadFile = new Button();
+            loadedFileLabel = new Label();
+            skip_btn = new Button();
             SuspendLayout();
             // 
-            // submit
+            // submit_btn
             // 
-            submit.Location = new Point(312, 229);
-            submit.Name = "submit";
-            submit.Size = new Size(112, 34);
-            submit.TabIndex = 0;
-            submit.Text = "回答";
-            submit.UseVisualStyleBackColor = true;
-            submit.Click += button1_Click;
+            submit_btn.Location = new Point(294, 229);
+            submit_btn.Name = "submit_btn";
+            submit_btn.Size = new Size(112, 34);
+            submit_btn.TabIndex = 0;
+            submit_btn.Text = "回答";
+            submit_btn.UseVisualStyleBackColor = true;
+            submit_btn.Click += submit_btn_Click;
             // 
-            // cancel
+            // reset_btn
             // 
-            cancel.Location = new Point(447, 229);
-            cancel.Name = "cancel";
-            cancel.Size = new Size(112, 34);
-            cancel.TabIndex = 1;
-            cancel.Text = "リセット";
-            cancel.UseVisualStyleBackColor = true;
-            cancel.Click += button2_Click;
+            reset_btn.Location = new Point(479, 229);
+            reset_btn.Name = "reset_btn";
+            reset_btn.Size = new Size(112, 34);
+            reset_btn.TabIndex = 1;
+            reset_btn.Text = "スタート";
+            reset_btn.UseVisualStyleBackColor = true;
+            reset_btn.Click += reset_btn_Click;
             // 
             // answerBox
             // 
@@ -148,12 +151,43 @@
             startLabel.TabIndex = 11;
             startLabel.Text = "リセットをクリックして開始";
             // 
+            // loadFile
+            // 
+            loadFile.Location = new Point(675, 12);
+            loadFile.Name = "loadFile";
+            loadFile.Size = new Size(112, 34);
+            loadFile.TabIndex = 12;
+            loadFile.Text = "ファイル選択";
+            loadFile.UseVisualStyleBackColor = true;
+            loadFile.Click += loadFile_Click;
+            // 
+            // loadedFileLabel
+            // 
+            loadedFileLabel.AutoSize = true;
+            loadedFileLabel.Location = new Point(675, 49);
+            loadedFileLabel.Name = "loadedFileLabel";
+            loadedFileLabel.Size = new Size(0, 25);
+            loadedFileLabel.TabIndex = 13;
+            // 
+            // skip_btn
+            // 
+            skip_btn.Location = new Point(412, 229);
+            skip_btn.Name = "skip_btn";
+            skip_btn.Size = new Size(38, 34);
+            skip_btn.TabIndex = 14;
+            skip_btn.Text = "＞";
+            skip_btn.UseVisualStyleBackColor = true;
+            skip_btn.Click += skip_btn_Click;
+            // 
             // mainWindow
             // 
-            AcceptButton = submit;
+            AcceptButton = submit_btn;
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(813, 389);
+            Controls.Add(skip_btn);
+            Controls.Add(loadedFileLabel);
+            Controls.Add(loadFile);
             Controls.Add(startLabel);
             Controls.Add(correctPercentData);
             Controls.Add(correctData);
@@ -164,19 +198,19 @@
             Controls.Add(correctLabel);
             Controls.Add(totalLabel);
             Controls.Add(answerBox);
-            Controls.Add(cancel);
-            Controls.Add(submit);
+            Controls.Add(reset_btn);
+            Controls.Add(submit_btn);
             Name = "mainWindow";
-            Text = "単語くん";
-            Load += Form1_Load;
+            Text = "単語くん - Reconstruction";
+            FormClosing += mainWindow_FormClosing;
             ResumeLayout(false);
             PerformLayout();
         }
 
         #endregion
 
-        private Button submit;
-        private Button cancel;
+        private Button submit_btn;
+        private Button reset_btn;
         private TextBox answerBox;
         private Label totalLabel;
         private Label correctLabel;
@@ -187,5 +221,8 @@
         private Label correctData;
         private Label correctPercentData;
         private Label startLabel;
+        private Button loadFile;
+        private Label loadedFileLabel;
+        private Button skip_btn;
     }
 }
