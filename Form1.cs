@@ -122,6 +122,9 @@ namespace button_practice
                         // commit to database // データベースにコミットする
                         transaction.Commit();
 
+                        // change file state // ファイルの状態を変更する
+                        isFileLoaded = false;
+
                     }
                     catch (Exception ex)
                     {
@@ -266,7 +269,7 @@ namespace button_practice
         // 他のファイルが読み込んでない場合、ファイルを読み込む
         private void loadFile_Click(object sender, EventArgs e)
         {
-            if (loadedFileLabel.Text.Length > 0)
+            if (isFileLoaded)
             {
                 MessageBox.Show("別のファイルがすでに読み込まれています。リセットして再試行してください。");
             }
@@ -319,6 +322,7 @@ namespace button_practice
                 updateTotalQuestions();
                 updatePercentCorrectAnswers();
                 generateNewQuestion();
+                yesOrNo.Text = "";
             }
         }
 
@@ -347,8 +351,6 @@ namespace button_practice
                         // change button text // ボタンテクストを変更する
                         reset_btn.Text = "リセット";
 
-                        // change file state // ファイルの状態を変更する
-                        isFileLoaded = false;
                     }
                     else
                     {
