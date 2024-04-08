@@ -15,18 +15,18 @@ namespace button_practice
         private string enCol;
 
         // initialize all SQL values from ini file
-        // 
+        // iniファイルからすべてのSQL変数を指定する
         public void setSqlVariables()
         {
             IniController iniController = new IniController("credentials.ini");
-            // connection information //
+            // connection information // 接続情報
             server = iniController.GetValue("Server");
             port = iniController.GetValue("Port");
             database = iniController.GetValue("Database");
             user = iniController.GetValue("User");
             password = iniController.GetValue("Password");
 
-            // table and column information // 
+            // table and column information // テーブルと欄の情報
             table = iniController.GetValue("Table");
             jpCol = iniController.GetValue("Japanese");
             enCol = iniController.GetValue("English");
@@ -440,7 +440,10 @@ namespace button_practice
         // アプリケーション終了時にデータベースを消去する
         private void mainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
-            _connection.Close();
+            if (_connection.State == ConnectionState.Open)
+            {
+                _connection.Close();
+            }
             deleteValuesFromDatabase();
         }
 

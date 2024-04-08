@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace button_practice
+﻿namespace button_practice
 {
     internal class IniController
     {
@@ -20,19 +14,19 @@ namespace button_practice
         {
             try
             {
-                // read all lines of ini file
-                // 
+                // read all lines of .ini file
+                // .iniファイルのすべての行を読む
                 string[] lines = File.ReadAllLines(filePath);
 
                 foreach (string line in lines)
                 {
                     // split each line by '=' to get key-value pairs
-                    // 
+                    // 各行を'='で分割し、キーと値のペアを取得する
                     string[] parts = line.Split('=');
                     if (parts.Length == 2)
                     {
                         // add key-value pair to settings dictionary
-                        //
+                        // 設定辞書にキーと値のペアを追加する
                         settings.Add(parts[0], parts[1]);
                     }
                 }
@@ -43,7 +37,7 @@ namespace button_practice
             }
         }
 
-        public string GetValue(string key) 
+        public string GetValue(string key)
         {
             if (settings.ContainsKey(key))
             {
