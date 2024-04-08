@@ -43,6 +43,7 @@
             loadFile = new Button();
             loadedFileLabel = new Label();
             skip_btn = new Button();
+            btn_change_sql_info = new Button();
             SuspendLayout();
             // 
             // submit_btn
@@ -147,13 +148,13 @@
             startLabel.AutoSize = true;
             startLabel.Location = new Point(339, 34);
             startLabel.Name = "startLabel";
-            startLabel.Size = new Size(192, 25);
+            startLabel.Size = new Size(198, 25);
             startLabel.TabIndex = 11;
-            startLabel.Text = "リセットをクリックして開始";
+            startLabel.Text = "スタートをクリックして開始";
             // 
             // loadFile
             // 
-            loadFile.Location = new Point(675, 12);
+            loadFile.Location = new Point(689, 12);
             loadFile.Name = "loadFile";
             loadFile.Size = new Size(112, 34);
             loadFile.TabIndex = 12;
@@ -164,7 +165,7 @@
             // loadedFileLabel
             // 
             loadedFileLabel.AutoSize = true;
-            loadedFileLabel.Location = new Point(675, 49);
+            loadedFileLabel.Location = new Point(689, 49);
             loadedFileLabel.Name = "loadedFileLabel";
             loadedFileLabel.Size = new Size(0, 25);
             loadedFileLabel.TabIndex = 13;
@@ -179,12 +180,23 @@
             skip_btn.UseVisualStyleBackColor = true;
             skip_btn.Click += skip_btn_Click;
             // 
+            // btn_change_sql_info
+            // 
+            btn_change_sql_info.Location = new Point(689, 343);
+            btn_change_sql_info.Name = "btn_change_sql_info";
+            btn_change_sql_info.Size = new Size(112, 34);
+            btn_change_sql_info.TabIndex = 15;
+            btn_change_sql_info.Text = "SQL情報変更";
+            btn_change_sql_info.UseVisualStyleBackColor = true;
+            btn_change_sql_info.Click += button1_Click;
+            // 
             // mainWindow
             // 
             AcceptButton = submit_btn;
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(813, 389);
+            Controls.Add(btn_change_sql_info);
             Controls.Add(skip_btn);
             Controls.Add(loadedFileLabel);
             Controls.Add(loadFile);
@@ -224,5 +236,6 @@
         private Button loadFile;
         private Label loadedFileLabel;
         private Button skip_btn;
+        private Button btn_change_sql_info;
     }
 }

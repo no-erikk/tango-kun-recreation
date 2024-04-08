@@ -5,12 +5,42 @@ namespace button_practice
 {
     public partial class mainWindow : Form
     {
+        private string server;
+        private string port;
+        private string database;
+        private string user;
+        private string password;
+        private string table;
+        private string jpCol;
+        private string enCol;
+
+        // initialize all SQL values from ini file
+        // 
+        public void setSqlVariables()
+        {
+            IniController iniController = new IniController("credentials.ini");
+            // connection information //
+            server = iniController.GetValue("Server");
+            port = iniController.GetValue("Port");
+            database = iniController.GetValue("Database");
+            user = iniController.GetValue("User");
+            password = iniController.GetValue("Password");
+
+            // table and column information // 
+            table = iniController.GetValue("Table");
+            jpCol = iniController.GetValue("Japanese");
+            enCol = iniController.GetValue("English");
+        }
+
         // initialize MySQL connection
         // MySQL接続の初期化
         private MySqlConnection _connection;
         private void initializeDatabase()
         {
-            string connectionString = "server=localhost; database=tango_kun; user=root; password=sqlpass; charset=utf8";
+            // get sql information // SQL情報を取得する
+            setSqlVariables();
+
+            string connectionString = $"server={server}; port={port}; database={database}; user={user}; password={password}; charset=utf8";
             _connection = new MySqlConnection(connectionString);
         }
 
@@ -53,7 +83,7 @@ namespace button_practice
                                 string[] values = line.Split(',');
                                 // prepare batch of questions and answers to be inserted into database
                                 // データベースに挿入する質問と回答のバッチを準備する
-                                string query = "INSERT INTO user_terms (user_terms_jp, user_terms_en) VALUES (@japanese, @english)";
+                                string query = $"INSERT INTO {table} ({jpCol}, {enCol}) VALUES (@japanese, @english)";
                                 MySqlCommand command = new MySqlCommand(query, _connection, transaction);
                                 command.Parameters.AddWithValue("@japanese", values[0]);
                                 command.Parameters.AddWithValue("@english", values[1]);
@@ -283,7 +313,7 @@ namespace button_practice
         // submit answer button //「回答」を押すと
         private void submit_btn_Click(object sender, EventArgs e)
         {
-            if(isFileLoaded)
+            if (isFileLoaded)
             {
                 string userAnswer = answerBox.Text.ToUpper();
 
@@ -364,6 +394,8 @@ namespace button_practice
             }
         }
 
+
+
         private void reset()
         {
             // ensure connection is closed // 接続を確実に閉じる
@@ -412,6 +444,12 @@ namespace button_practice
             deleteValuesFromDatabase();
         }
 
-        
+        private void button1_Click(object sender, EventArgs e)
+        {
+            using (SqlCredentialsForm form = new SqlCredentialsForm())
+            {
+                form.ShowDialog();
+            }
+        }
     }
 }
