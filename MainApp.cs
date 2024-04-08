@@ -5,7 +5,7 @@ namespace button_practice
 {
     public partial class MainWindow : Form
     {
-        IniController _controller;
+        private IniController _controller;
         private string server;
         private string port;
         private string database;
@@ -23,6 +23,11 @@ namespace button_practice
 
         private MySqlConnection _connection;
         private DataTable dataTable;
+
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
 
         // initialize all SQL values from ini file
         // iniファイルからすべてのSQL変数をする
@@ -56,6 +61,9 @@ namespace button_practice
         // select CSV file // CSVを選ぶ
         private void SelectFile()
         {
+            // prepare database connection
+            InitializeDatabase();
+
             // prepare file retrieval constraints
             // ファイル検索制約を準備する
             OpenFileDialog openFileDialog = new();
@@ -140,7 +148,7 @@ namespace button_practice
         {
             try
             {
-                _connection.Open();
+                    _connection.Open();
 
                 using MySqlTransaction transaction = _connection.BeginTransaction();
                 try
@@ -285,12 +293,6 @@ namespace button_practice
         {
             double percentCorrect = (double)correctQuestions / totalQuestions * 100;
             correctPercentData.Text = Math.Round(percentCorrect, 2) + "%";
-        }
-
-        public MainWindow()
-        {
-            InitializeComponent();
-            InitializeDatabase();
         }
 
         // load file if no other files are loaded
@@ -439,11 +441,10 @@ namespace button_practice
         // アプリケーション終了時にデータベースを消去する
         private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (_connection.State == ConnectionState.Open)
+            if (_connection != null)
             {
-                _connection.Close();
+                DeleteValuesFromDatabase();
             }
-            DeleteValuesFromDatabase();
         }
 
         private void Button1_Click(object sender, EventArgs e)
