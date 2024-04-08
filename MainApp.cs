@@ -154,12 +154,12 @@ namespace button_practice
                 try
                 {
                     // delete values　// 値の削除
-                    string deleteQuery = "DELETE FROM user_terms";
+                    string deleteQuery = $"DELETE FROM {table}";
                     MySqlCommand deleteCommand = new(deleteQuery, _connection, transaction);
                     deleteCommand.ExecuteNonQuery();
 
                     // reset index　// インデックスの再設定
-                    string resetQuery = "ALTER TABLE user_terms AUTO_INCREMENT = 1";
+                    string resetQuery = $"ALTER TABLE {table} AUTO_INCREMENT = 1";
                     MySqlCommand resetCommand = new(resetQuery, _connection, transaction);
                     resetCommand.ExecuteNonQuery();
 
@@ -203,7 +203,7 @@ namespace button_practice
 
                 // select all values from datatable
                 // データテーブルからすべての値を選ぶ
-                string query = "SELECT * FROM user_terms";
+                string query = $"SELECT * FROM {table}";
                 MySqlCommand command = new(query, _connection);
 
                 // fill datatable with values from database
@@ -239,7 +239,7 @@ namespace button_practice
         {
             // select question from row of data
             // データの行から質問を選ぶ
-            DataRow[] rows = dataTable.Select($"user_terms_jp = '{currentQuestion}'");
+            DataRow[] rows = dataTable.Select($"{jpCol} = '{currentQuestion}'");
             DataRow row = rows[0];
 
             string answer = row[2].ToString().ToUpper();

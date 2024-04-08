@@ -58,7 +58,7 @@
 
                 System.IO.File.WriteAllText("credentials.ini", iniContent);
 
-                MessageBox.Show("Saved");
+                MessageBox.Show("SQLサーバー情報を保存しました。");
             }
             catch (Exception ex)
             {
