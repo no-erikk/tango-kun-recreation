@@ -1,6 +1,6 @@
 ﻿namespace button_practice
 {
-    partial class mainWindow
+    partial class MainWindow
     {
         /// <summary>
         ///  Required designer variable.
@@ -54,7 +54,7 @@
             submit_btn.TabIndex = 0;
             submit_btn.Text = "回答";
             submit_btn.UseVisualStyleBackColor = true;
-            submit_btn.Click += submit_btn_Click;
+            submit_btn.Click += Submit_btn_Click;
             // 
             // reset_btn
             // 
@@ -64,7 +64,7 @@
             reset_btn.TabIndex = 1;
             reset_btn.Text = "スタート";
             reset_btn.UseVisualStyleBackColor = true;
-            reset_btn.Click += reset_btn_Click;
+            reset_btn.Click += Reset_btn_Click;
             // 
             // answerBox
             // 
@@ -160,7 +160,7 @@
             loadFile.TabIndex = 12;
             loadFile.Text = "ファイル選択";
             loadFile.UseVisualStyleBackColor = true;
-            loadFile.Click += loadFile_Click;
+            loadFile.Click += LoadFile_Click;
             // 
             // loadedFileLabel
             // 
@@ -178,7 +178,7 @@
             skip_btn.TabIndex = 14;
             skip_btn.Text = "＞";
             skip_btn.UseVisualStyleBackColor = true;
-            skip_btn.Click += skip_btn_Click;
+            skip_btn.Click += Skip_btn_Click;
             // 
             // btn_change_sql_info
             // 
@@ -188,9 +188,9 @@
             btn_change_sql_info.TabIndex = 15;
             btn_change_sql_info.Text = "SQL情報変更";
             btn_change_sql_info.UseVisualStyleBackColor = true;
-            btn_change_sql_info.Click += button1_Click;
+            btn_change_sql_info.Click += Button1_Click;
             // 
-            // mainWindow
+            // MainWindow
             // 
             AcceptButton = submit_btn;
             AutoScaleDimensions = new SizeF(10F, 25F);
@@ -212,9 +212,9 @@
             Controls.Add(answerBox);
             Controls.Add(reset_btn);
             Controls.Add(submit_btn);
-            Name = "mainWindow";
-            Text = "単語くん - Reconstruction";
-            FormClosing += mainWindow_FormClosing;
+            Name = "MainWindow";
+            Text = "単語くん - YE版";
+            FormClosing += MainWindow_FormClosing;
             ResumeLayout(false);
             PerformLayout();
         }

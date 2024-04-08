@@ -135,7 +135,7 @@
             sql_data_save.TabIndex = 8;
             sql_data_save.Text = "保存";
             sql_data_save.UseVisualStyleBackColor = true;
-            sql_data_save.Click += sql_data_save_Click;
+            sql_data_save.Click += Sql_data_save_Click;
             // 
             // table_data
             // 
@@ -209,6 +209,7 @@
             Controls.Add(host_label);
             Name = "SqlCredentialsForm";
             Text = "SQLサーバー情報";
+            Load += SqlCredentialsForm_Load;
             ResumeLayout(false);
             PerformLayout();
         }

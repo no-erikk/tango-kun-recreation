@@ -3,8 +3,9 @@ using System.Data;
 
 namespace button_practice
 {
-    public partial class mainWindow : Form
+    public partial class MainWindow : Form
     {
+        IniController _controller;
         private string server;
         private string port;
         private string database;
@@ -14,43 +15,51 @@ namespace button_practice
         private string jpCol;
         private string enCol;
 
-        // initialize all SQL values from ini file
-        // iniファイルからすべてのSQL変数を指定する
-        public void setSqlVariables()
-        {
-            IniController iniController = new IniController("credentials.ini");
-            // connection information // 接続情報
-            server = iniController.GetValue("Server");
-            port = iniController.GetValue("Port");
-            database = iniController.GetValue("Database");
-            user = iniController.GetValue("User");
-            password = iniController.GetValue("Password");
+        private bool isFileLoaded;
+        private bool questionMode;
+        private string currentQuestion;
+        private int totalQuestions = 0;
+        private int correctQuestions = 0;
 
-            // table and column information // テーブルと欄の情報
-            table = iniController.GetValue("Table");
-            jpCol = iniController.GetValue("Japanese");
-            enCol = iniController.GetValue("English");
+        private MySqlConnection _connection;
+        private DataTable dataTable;
+
+        // initialize all SQL values from ini file
+        // iniファイルからすべてのSQL変数をする
+        public void SetSqlVariables()
+        {
+            _controller = new IniController("credentials.ini");
+            // connection information // 接続情報
+            server = _controller.GetValue("Server");
+            port = _controller.GetValue("Port");
+            database = _controller.GetValue("Database");
+            user = _controller.GetValue("User");
+            password = _controller.GetValue("Password");
+
+            // table and column information // 
+            table = _controller.GetValue("Table");
+            jpCol = _controller.GetValue("Japanese");
+            enCol = _controller.GetValue("English");
         }
 
         // initialize MySQL connection
         // MySQL接続の初期化
-        private MySqlConnection _connection;
-        private void initializeDatabase()
+        private void InitializeDatabase()
         {
             // get sql information // SQL情報を取得する
-            setSqlVariables();
+            SetSqlVariables();
 
             string connectionString = $"server={server}; port={port}; database={database}; user={user}; password={password}; charset=utf8";
             _connection = new MySqlConnection(connectionString);
         }
 
         // select CSV file // CSVを選ぶ
-        private bool isFileLoaded;
-        private void selectFile()
+        private void SelectFile()
         {
             // prepare file retrieval constraints
             // ファイル検索制約を準備する
-            OpenFileDialog ofd = new OpenFileDialog();
+            OpenFileDialog openFileDialog = new();
+            OpenFileDialog ofd = openFileDialog;
             ofd.Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*";
             ofd.RestoreDirectory = true;
 
@@ -71,49 +80,47 @@ namespace button_practice
 
                     // batch insert all questions and answers from CSV into database
                     // すべての質問と回答をCSVからデータベースに一括挿入する
-                    using (MySqlTransaction transaction = _connection.BeginTransaction())
+                    using MySqlTransaction transaction = _connection.BeginTransaction();
+                    try
                     {
-                        try
+                        List<MySqlCommand> commands = [];
+                        foreach (string line in lines)
                         {
-                            List<MySqlCommand> commands = new List<MySqlCommand>();
-                            foreach (string line in lines)
-                            {
-                                // divide values via delimiter
-                                // 区切り文字で値を分割する
-                                string[] values = line.Split(',');
-                                // prepare batch of questions and answers to be inserted into database
-                                // データベースに挿入する質問と回答のバッチを準備する
-                                string query = $"INSERT INTO {table} ({jpCol}, {enCol}) VALUES (@japanese, @english)";
-                                MySqlCommand command = new MySqlCommand(query, _connection, transaction);
-                                command.Parameters.AddWithValue("@japanese", values[0]);
-                                command.Parameters.AddWithValue("@english", values[1]);
+                            // divide values via delimiter
+                            // 区切り文字で値を分割する
+                            string[] values = line.Split(',');
+                            // prepare batch of questions and answers to be inserted into database
+                            // データベースに挿入する質問と回答のバッチを準備する
+                            string query = $"INSERT INTO {table} ({jpCol}, {enCol}) VALUES (@japanese, @english)";
+                            MySqlCommand command = new(query, _connection, transaction);
+                            command.Parameters.AddWithValue("@japanese", values[0]);
+                            command.Parameters.AddWithValue("@english", values[1]);
 
-                                commands.Add(command);
-                            }
-
-                            // execute all commands in the batch
-                            // バッチ内の全コマンドを実行する
-                            foreach (MySqlCommand command in commands)
-                            {
-                                command.ExecuteNonQuery();
-                            }
-
-                            // commit to database
-                            // データベースにコミットする
-                            transaction.Commit();
-
-                            // change file state // ファイルの状態を変更する
-                            isFileLoaded = true;
-
-                            MessageBox.Show("ファイルは正常にロードされた。");
+                            commands.Add(command);
                         }
-                        catch (Exception ex)
+
+                        // execute all commands in the batch
+                        // バッチ内の全コマンドを実行する
+                        foreach (MySqlCommand command in commands)
                         {
-                            // rollback in case of failure
-                            // 失敗時のロールバック
-                            transaction.Rollback();
-                            MessageBox.Show(ex.Message);
+                            command.ExecuteNonQuery();
                         }
+
+                        // commit to database
+                        // データベースにコミットする
+                        transaction.Commit();
+
+                        // change file state // ファイルの状態を変更する
+                        isFileLoaded = true;
+
+                        MessageBox.Show("ファイルは正常にロードされた。");
+                    }
+                    catch (Exception ex)
+                    {
+                        // rollback in case of failure
+                        // 失敗時のロールバック
+                        transaction.Rollback();
+                        MessageBox.Show(ex.Message);
                     }
                 }
                 catch (Exception ex)
@@ -129,41 +136,38 @@ namespace button_practice
 
         // delete values from database
         // データベースから値を削除する
-        private void deleteValuesFromDatabase()
+        private void DeleteValuesFromDatabase()
         {
             try
             {
                 _connection.Open();
 
-                using (MySqlTransaction transaction = _connection.BeginTransaction())
+                using MySqlTransaction transaction = _connection.BeginTransaction();
+                try
                 {
-                    try
-                    {
-                        // delete values　// 値の削除
-                        string deleteQuery = "DELETE FROM user_terms";
-                        MySqlCommand deleteCommand = new MySqlCommand(deleteQuery, _connection, transaction);
-                        deleteCommand.ExecuteNonQuery();
+                    // delete values　// 値の削除
+                    string deleteQuery = "DELETE FROM user_terms";
+                    MySqlCommand deleteCommand = new(deleteQuery, _connection, transaction);
+                    deleteCommand.ExecuteNonQuery();
 
-                        // reset index　// インデックスの再設定
-                        string resetQuery = "ALTER TABLE user_terms AUTO_INCREMENT = 1";
-                        MySqlCommand resetCommand = new MySqlCommand(resetQuery, _connection, transaction);
-                        resetCommand.ExecuteNonQuery();
+                    // reset index　// インデックスの再設定
+                    string resetQuery = "ALTER TABLE user_terms AUTO_INCREMENT = 1";
+                    MySqlCommand resetCommand = new(resetQuery, _connection, transaction);
+                    resetCommand.ExecuteNonQuery();
 
-                        // commit to database // データベースにコミットする
-                        transaction.Commit();
+                    // commit to database // データベースにコミットする
+                    transaction.Commit();
 
-                        // change file state // ファイルの状態を変更する
-                        isFileLoaded = false;
+                    // change file state // ファイルの状態を変更する
+                    isFileLoaded = false;
 
-                    }
-                    catch (Exception ex)
-                    {
-                        // rollback in case of failure
-                        // 失敗時のロールバック
-                        transaction.Rollback();
-                        MessageBox.Show(ex.Message);
-                    }
-
+                }
+                catch (Exception ex)
+                {
+                    // rollback in case of failure
+                    // 失敗時のロールバック
+                    transaction.Rollback();
+                    MessageBox.Show(ex.Message);
                 }
             }
             catch (Exception ex)
@@ -181,8 +185,7 @@ namespace button_practice
 
         // fill datatable with values from database
         // データベースからの値でデータテーブルを満たす
-        private DataTable dataTable;
-        private void initializeDataTable()
+        private void InitializeDataTable()
         {
             dataTable = new DataTable();
 
@@ -193,14 +196,12 @@ namespace button_practice
                 // select all values from datatable
                 // データテーブルからすべての値を選ぶ
                 string query = "SELECT * FROM user_terms";
-                MySqlCommand command = new MySqlCommand(query, _connection);
+                MySqlCommand command = new(query, _connection);
 
                 // fill datatable with values from database
                 // データベースからの値でデータテーブルを満たす
-                using (MySqlDataAdapter adapter = new MySqlDataAdapter(command))
-                {
-                    adapter.Fill(dataTable);
-                }
+                using MySqlDataAdapter adapter = new(command);
+                adapter.Fill(dataTable);
             }
             catch (Exception ex)
             {
@@ -212,11 +213,11 @@ namespace button_practice
 
         // helper func - randomly select a row from the datatable
         // ヘルパー関数 - データテーブルからランダムに行を選ぶ
-        private DataRow randomRow()
+        private DataRow RandomRow()
         {
             // generate a random index
             // ランダムインデックスを生成する
-            Random random = new Random();
+            Random random = new();
             int randomIndex = random.Next(0, dataTable.Rows.Count);
 
             // select the "Japanese" word matching the random index
@@ -226,8 +227,7 @@ namespace button_practice
 
         // helper func - get answer to current question and compare it to user input
         // ヘルパー関数 - 現在の質問に対する答えを取得し、ユーザー入力と比較する
-        private string currentQuestion;
-        private void checkAnswer(string userAns)
+        private void CheckAnswer(string userAns)
         {
             // select question from row of data
             // データの行から質問を選ぶ
@@ -242,10 +242,10 @@ namespace button_practice
             {
                 // if correct // 正解の場合
                 yesOrNo.Text = "〇";
-                updateCorrectAnswers();
+                UpdateCorrectAnswers();
 
                 // select new question // 新しい質問を選ぶ
-                generateNewQuestion();
+                GenerateNewQuestion();
             }
             else
             {
@@ -256,17 +256,16 @@ namespace button_practice
 
         // helper func - generates a new question and assigns it to currentQuestion
         // ヘルパー関数 - 新しい質問を生成し、currentQuestionに代入する
-        private void generateNewQuestion()
+        private void GenerateNewQuestion()
         {
-            DataRow getCurrentQuestion = randomRow();
+            DataRow getCurrentQuestion = RandomRow();
             currentQuestion = getCurrentQuestion[1].ToString();
             questionBox.Text = currentQuestion;
         }
 
         // helper func - add 1 the total number of questions and refresh UI
         // ヘルパー関数 - 質問総数に1を加え、UIをリフレッシュする
-        private int totalQuestions = 0;
-        private void updateTotalQuestions()
+        private void UpdateTotalQuestions()
         {
             totalQuestions++;
             totalData.Text = totalQuestions.ToString();
@@ -274,8 +273,7 @@ namespace button_practice
 
         // helper func - add 1 to the number of correct answers and refresh UI
         // ヘルパー関数 - 正解数に1を加え、UIをリフレッシュする
-        private int correctQuestions = 0;
-        private void updateCorrectAnswers()
+        private void UpdateCorrectAnswers()
         {
             correctQuestions++;
             correctData.Text = correctQuestions.ToString();
@@ -283,21 +281,21 @@ namespace button_practice
 
         // helper func - calculate percentCorrect and refresh UI
         // ヘルパー関数 - percentCorrectを計算し、UIをリフレッシュする
-        private void updatePercentCorrectAnswers()
+        private void UpdatePercentCorrectAnswers()
         {
             double percentCorrect = (double)correctQuestions / totalQuestions * 100;
             correctPercentData.Text = Math.Round(percentCorrect, 2) + "%";
         }
 
-        public mainWindow()
+        public MainWindow()
         {
             InitializeComponent();
-            initializeDatabase();
+            InitializeDatabase();
         }
 
         // load file if no other files are loaded
         // 他のファイルが読み込んでない場合、ファイルを読み込む
-        private void loadFile_Click(object sender, EventArgs e)
+        private void LoadFile_Click(object sender, EventArgs e)
         {
             if (isFileLoaded)
             {
@@ -305,15 +303,15 @@ namespace button_practice
             }
             else // default state // 標準状態
             {
-                selectFile();
-                initializeDataTable();
+                SelectFile();
+                InitializeDataTable();
             }
         }
 
         // submit answer button //「回答」を押すと
-        private void submit_btn_Click(object sender, EventArgs e)
+        private void Submit_btn_Click(object sender, EventArgs e)
         {
-            if (isFileLoaded)
+            if (questionMode)
             {
                 string userAnswer = answerBox.Text.ToUpper();
 
@@ -323,12 +321,12 @@ namespace button_practice
                 {
                     // if not empty
                     // 回答がからじゃないなら
-                    checkAnswer(userAnswer);
+                    CheckAnswer(userAnswer);
 
                     // run helper functions to update total questions and percentage of correct answers
                     // ヘルパー関数を実行して、問題の合計と正解率を更新する
-                    updateTotalQuestions();
-                    updatePercentCorrectAnswers();
+                    UpdateTotalQuestions();
+                    UpdatePercentCorrectAnswers();
 
                     // clear answer box
                     // アンサーボックスを消去する
@@ -345,19 +343,19 @@ namespace button_practice
 
         // skip current question
         // 現在の質問を飛ばす
-        private void skip_btn_Click(object sender, EventArgs e)
+        private void Skip_btn_Click(object sender, EventArgs e)
         {
-            if (isFileLoaded)
+            if (questionMode)
             {
-                updateTotalQuestions();
-                updatePercentCorrectAnswers();
-                generateNewQuestion();
+                UpdateTotalQuestions();
+                UpdatePercentCorrectAnswers();
+                GenerateNewQuestion();
                 yesOrNo.Text = "";
             }
         }
 
         // start/reset button // 「スタート」・「リセット」を押すと
-        private void reset_btn_Click(object sender, EventArgs e)
+        private void Reset_btn_Click(object sender, EventArgs e)
         {
             try
             {
@@ -366,21 +364,22 @@ namespace button_practice
                 if (questionBox.Text.Length > 0 && startLabel.Visible == false)
                 {
                     startLabel.Show();
-                    reset();
+                    Reset();
 
                     // change button text // ボタンテクストを変更する
                     reset_btn.Text = "スタート";
+                    questionMode = false;
                 }
                 else // default state // 標準状態
                 {
                     if (isFileLoaded)
                     {
                         startLabel.Hide();
-                        generateNewQuestion();
+                        GenerateNewQuestion();
 
                         // change button text // ボタンテクストを変更する
                         reset_btn.Text = "リセット";
-
+                        questionMode = true;
                     }
                     else
                     {
@@ -396,7 +395,7 @@ namespace button_practice
 
 
 
-        private void reset()
+        private void Reset()
         {
             // ensure connection is closed // 接続を確実に閉じる
             if (_connection.State == ConnectionState.Open)
@@ -424,12 +423,12 @@ namespace button_practice
 
             // clear percent of correct answers and reset counter
             // 正解率を消去し、カウンターをリセットする
-            updatePercentCorrectAnswers();
+            UpdatePercentCorrectAnswers();
             correctPercentData.Text = string.Empty;
 
             // clear loaded file and values from database
             // 読み込んだファイルと値をデータベースから消去する
-            deleteValuesFromDatabase();
+            DeleteValuesFromDatabase();
             loadedFileLabel.Text = string.Empty;
 
             // change file state // ファイルの状態を変更する
@@ -438,21 +437,19 @@ namespace button_practice
 
         // clear database when application is closed
         // アプリケーション終了時にデータベースを消去する
-        private void mainWindow_FormClosing(object sender, FormClosingEventArgs e)
+        private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (_connection.State == ConnectionState.Open)
             {
                 _connection.Close();
             }
-            deleteValuesFromDatabase();
+            DeleteValuesFromDatabase();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void Button1_Click(object sender, EventArgs e)
         {
-            using (SqlCredentialsForm form = new SqlCredentialsForm())
-            {
-                form.ShowDialog();
-            }
+            using SqlCredentialsForm form = new();
+            form.ShowDialog();
         }
     }
 }

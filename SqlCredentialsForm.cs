@@ -2,12 +2,28 @@
 {
     public partial class SqlCredentialsForm : Form
     {
+        private IniController _controller;
+
         public SqlCredentialsForm()
         {
             InitializeComponent();
         }
 
-        private void sql_data_save_Click(object sender, EventArgs e)
+        private void SqlCredentialsForm_Load(object sender, EventArgs e)
+        {
+            // load values from .ini //
+            _controller = new IniController("credentials.ini");
+            host_data.Text = _controller.GetValue("Server");
+            port_data.Text = _controller.GetValue("Port");
+            database_data.Text = _controller.GetValue("Database");
+            table_data.Text = _controller.GetValue("Table");
+            jp_col_data.Text = _controller.GetValue("Japanese");
+            en_col_data.Text = _controller.GetValue("English");
+            user_data.Text = _controller.GetValue("User");
+            password_data.Text = _controller.GetValue("Password");
+        }
+
+        private void Sql_data_save_Click(object sender, EventArgs e)
         {
             // get input values
             // 入力値を取得する
@@ -24,11 +40,16 @@
             // 入力値を.iniファイルで保存する
             SaveCredentialsToIni(server, port, database, table, jp_col, en_col, user, password);
 
+            // load values to main app
+            // 
+            MainWindow mainWindow = new();
+            mainWindow.SetSqlVariables();
+
             // close form //　フォームを閉じる
             this.Close();
         }
 
-        private void SaveCredentialsToIni(string server, string port, string database, string table, string jp, string en, string user, string password)
+        private static void SaveCredentialsToIni(string server, string port, string database, string table, string jp, string en, string user, string password)
         {
             try
             {

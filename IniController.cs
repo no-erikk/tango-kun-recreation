@@ -2,11 +2,11 @@
 {
     internal class IniController
     {
-        private Dictionary<string, string> settings;
+        private readonly Dictionary<string, string> settings;
 
         public IniController(string fileName)
         {
-            settings = new Dictionary<string, string>();
+            settings = [];
             LoadSettings(fileName);
         }
 
@@ -39,9 +39,9 @@
 
         public string GetValue(string key)
         {
-            if (settings.ContainsKey(key))
+            if (settings.TryGetValue(key, out string? value))
             {
-                return settings[key];
+                return value;
             }
             else
             {
