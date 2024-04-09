@@ -43,7 +43,6 @@
             loadFile = new Button();
             loadedFileLabel = new Label();
             skip_btn = new Button();
-            btn_change_sql_info = new Button();
             SuspendLayout();
             // 
             // submit_btn
@@ -51,7 +50,7 @@
             submit_btn.Location = new Point(294, 229);
             submit_btn.Name = "submit_btn";
             submit_btn.Size = new Size(112, 34);
-            submit_btn.TabIndex = 0;
+            submit_btn.TabIndex = 2;
             submit_btn.Text = "回答";
             submit_btn.UseVisualStyleBackColor = true;
             submit_btn.Click += Submit_btn_Click;
@@ -61,7 +60,7 @@
             reset_btn.Location = new Point(479, 229);
             reset_btn.Name = "reset_btn";
             reset_btn.Size = new Size(112, 34);
-            reset_btn.TabIndex = 1;
+            reset_btn.TabIndex = 4;
             reset_btn.Text = "スタート";
             reset_btn.UseVisualStyleBackColor = true;
             reset_btn.Click += Reset_btn_Click;
@@ -71,7 +70,7 @@
             answerBox.Location = new Point(246, 170);
             answerBox.Name = "answerBox";
             answerBox.Size = new Size(390, 31);
-            answerBox.TabIndex = 2;
+            answerBox.TabIndex = 1;
             // 
             // totalLabel
             // 
@@ -154,10 +153,10 @@
             // 
             // loadFile
             // 
-            loadFile.Location = new Point(689, 12);
+            loadFile.Location = new Point(666, 12);
             loadFile.Name = "loadFile";
             loadFile.Size = new Size(112, 34);
-            loadFile.TabIndex = 12;
+            loadFile.TabIndex = 5;
             loadFile.Text = "ファイル選択";
             loadFile.UseVisualStyleBackColor = true;
             loadFile.Click += LoadFile_Click;
@@ -165,7 +164,7 @@
             // loadedFileLabel
             // 
             loadedFileLabel.AutoSize = true;
-            loadedFileLabel.Location = new Point(689, 49);
+            loadedFileLabel.Location = new Point(666, 49);
             loadedFileLabel.Name = "loadedFileLabel";
             loadedFileLabel.Size = new Size(0, 25);
             loadedFileLabel.TabIndex = 13;
@@ -175,20 +174,10 @@
             skip_btn.Location = new Point(412, 229);
             skip_btn.Name = "skip_btn";
             skip_btn.Size = new Size(38, 34);
-            skip_btn.TabIndex = 14;
+            skip_btn.TabIndex = 3;
             skip_btn.Text = "＞";
             skip_btn.UseVisualStyleBackColor = true;
             skip_btn.Click += Skip_btn_Click;
-            // 
-            // btn_change_sql_info
-            // 
-            btn_change_sql_info.Location = new Point(689, 343);
-            btn_change_sql_info.Name = "btn_change_sql_info";
-            btn_change_sql_info.Size = new Size(112, 34);
-            btn_change_sql_info.TabIndex = 15;
-            btn_change_sql_info.Text = "SQL情報変更";
-            btn_change_sql_info.UseVisualStyleBackColor = true;
-            btn_change_sql_info.Click += Button1_Click;
             // 
             // MainWindow
             // 
@@ -196,7 +185,6 @@
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(813, 389);
-            Controls.Add(btn_change_sql_info);
             Controls.Add(skip_btn);
             Controls.Add(loadedFileLabel);
             Controls.Add(loadFile);
@@ -214,7 +202,6 @@
             Controls.Add(submit_btn);
             Name = "MainWindow";
             Text = "単語くん - YE版";
-            FormClosing += MainWindow_FormClosing;
             ResumeLayout(false);
             PerformLayout();
         }
@@ -236,6 +223,5 @@
         private Button loadFile;
         private Label loadedFileLabel;
         private Button skip_btn;
-        private Button btn_change_sql_info;
     }
 }

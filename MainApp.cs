@@ -1,19 +1,9 @@
-﻿using MySql.Data.MySqlClient;
-using System.Data;
+﻿using System.Data;
 
 namespace button_practice
 {
     public partial class MainWindow : Form
     {
-        private IniController _controller;
-        private string server;
-        private string port;
-        private string database;
-        private string user;
-        private string password;
-        private string table;
-        private string jpCol;
-        private string enCol;
 
         private bool isFileLoaded;
         private bool questionMode;
@@ -21,7 +11,6 @@ namespace button_practice
         private int totalQuestions = 0;
         private int correctQuestions = 0;
 
-        private MySqlConnection _connection;
         private DataTable dataTable;
 
         public MainWindow()
@@ -29,41 +18,9 @@ namespace button_practice
             InitializeComponent();
         }
 
-        // initialize all SQL values from ini file
-        // iniファイルからすべてのSQL変数をする
-        public void SetSqlVariables()
-        {
-            _controller = new IniController("credentials.ini");
-            // connection information // 接続情報
-            server = _controller.GetValue("Server");
-            port = _controller.GetValue("Port");
-            database = _controller.GetValue("Database");
-            user = _controller.GetValue("User");
-            password = _controller.GetValue("Password");
-
-            // table and column information // 
-            table = _controller.GetValue("Table");
-            jpCol = _controller.GetValue("Japanese");
-            enCol = _controller.GetValue("English");
-        }
-
-        // initialize MySQL connection
-        // MySQL接続の初期化
-        private void InitializeDatabase()
-        {
-            // get sql information // SQL情報を取得する
-            SetSqlVariables();
-
-            string connectionString = $"server={server}; port={port}; database={database}; user={user}; password={password}; charset=utf8";
-            _connection = new MySqlConnection(connectionString);
-        }
-
-        // select CSV file // CSVを選ぶ
+        // select .csv file // .csvを選ぶ
         private void SelectFile()
         {
-            // prepare database connection
-            InitializeDatabase();
-
             // prepare file retrieval constraints
             // ファイル検索制約を準備する
             OpenFileDialog openFileDialog = new();
@@ -71,152 +28,18 @@ namespace button_practice
             ofd.Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*";
             ofd.RestoreDirectory = true;
 
-            if (ofd.ShowDialog() == DialogResult.OK)
+            // load .csv data to datatable
+            // 
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                try
-                {
-                    // show name of loaded file
-                    // 読み込んでるファイル名を表示する
-                    string fileName = Path.GetFileName(ofd.FileName);
-                    loadedFileLabel.Text = fileName;
+                string csvFilePath = ofd.FileName;
 
-                    // read loaded file
-                    // 読み込んでるファイルを読む
-                    string[] lines = File.ReadAllLines(ofd.FileName);
+                dataTable = CsvProcessor.ReadCsv(csvFilePath);
 
-                    _connection.Open();
-
-                    // batch insert all questions and answers from CSV into database
-                    // すべての質問と回答をCSVからデータベースに一括挿入する
-                    using MySqlTransaction transaction = _connection.BeginTransaction();
-                    try
-                    {
-                        List<MySqlCommand> commands = [];
-                        foreach (string line in lines)
-                        {
-                            // divide values via delimiter
-                            // 区切り文字で値を分割する
-                            string[] values = line.Split(',');
-                            // prepare batch of questions and answers to be inserted into database
-                            // データベースに挿入する質問と回答のバッチを準備する
-                            string query = $"INSERT INTO {table} ({jpCol}, {enCol}) VALUES (@japanese, @english)";
-                            MySqlCommand command = new(query, _connection, transaction);
-                            command.Parameters.AddWithValue("@japanese", values[0]);
-                            command.Parameters.AddWithValue("@english", values[1]);
-
-                            commands.Add(command);
-                        }
-
-                        // execute all commands in the batch
-                        // バッチ内の全コマンドを実行する
-                        foreach (MySqlCommand command in commands)
-                        {
-                            command.ExecuteNonQuery();
-                        }
-
-                        // commit to database
-                        // データベースにコミットする
-                        transaction.Commit();
-
-                        // change file state // ファイルの状態を変更する
-                        isFileLoaded = true;
-
-                        MessageBox.Show("ファイルは正常にロードされた。");
-                    }
-                    catch (Exception ex)
-                    {
-                        // rollback in case of failure
-                        // 失敗時のロールバック
-                        transaction.Rollback();
-                        MessageBox.Show(ex.Message);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
-                finally
-                {
-                    _connection.Close();
-                }
+                // change file state // ファイルの状態を変更する
+                isFileLoaded = true;
+                loadedFileLabel.Text = Path.GetFileName(csvFilePath);
             }
-        }
-
-        // delete values from database
-        // データベースから値を削除する
-        private void DeleteValuesFromDatabase()
-        {
-            try
-            {
-                    _connection.Open();
-
-                using MySqlTransaction transaction = _connection.BeginTransaction();
-                try
-                {
-                    // delete values　// 値の削除
-                    string deleteQuery = $"DELETE FROM {table}";
-                    MySqlCommand deleteCommand = new(deleteQuery, _connection, transaction);
-                    deleteCommand.ExecuteNonQuery();
-
-                    // reset index　// インデックスの再設定
-                    string resetQuery = $"ALTER TABLE {table} AUTO_INCREMENT = 1";
-                    MySqlCommand resetCommand = new(resetQuery, _connection, transaction);
-                    resetCommand.ExecuteNonQuery();
-
-                    // commit to database // データベースにコミットする
-                    transaction.Commit();
-
-                    // change file state // ファイルの状態を変更する
-                    isFileLoaded = false;
-
-                }
-                catch (Exception ex)
-                {
-                    // rollback in case of failure
-                    // 失敗時のロールバック
-                    transaction.Rollback();
-                    MessageBox.Show(ex.Message);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-            finally
-            {
-                if (_connection.State == ConnectionState.Open)
-                {
-                    _connection.Close();
-                }
-            }
-        }
-
-        // fill datatable with values from database
-        // データベースからの値でデータテーブルを満たす
-        private void InitializeDataTable()
-        {
-            dataTable = new DataTable();
-
-            try
-            {
-                _connection.Open();
-
-                // select all values from datatable
-                // データテーブルからすべての値を選ぶ
-                string query = $"SELECT * FROM {table}";
-                MySqlCommand command = new(query, _connection);
-
-                // fill datatable with values from database
-                // データベースからの値でデータテーブルを満たす
-                using MySqlDataAdapter adapter = new(command);
-                adapter.Fill(dataTable);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-            // connection is closed in selectFile()
-            // selectFile()で接続を閉じる
         }
 
         // helper func - randomly select a row from the datatable
@@ -237,12 +60,20 @@ namespace button_practice
         // ヘルパー関数 - 現在の質問に対する答えを取得し、ユーザー入力と比較する
         private void CheckAnswer(string userAns)
         {
+            DataRow questionRow = null;
+
             // select question from row of data
             // データの行から質問を選ぶ
-            DataRow[] rows = dataTable.Select($"{jpCol} = '{currentQuestion}'");
-            DataRow row = rows[0];
+            foreach (DataRow row in dataTable.Rows)
+            {
+                if (row[0].ToString() == currentQuestion)
+                {
+                    questionRow = row;
+                    break;
+                }
+            }
 
-            string answer = row[2].ToString().ToUpper();
+            string answer = questionRow[1].ToString().ToUpper();
 
             // check if user input matches the "English" answer
             // ユーザー入力が "English "答えにマッチするかチェックする
@@ -267,7 +98,7 @@ namespace button_practice
         private void GenerateNewQuestion()
         {
             DataRow getCurrentQuestion = RandomRow();
-            currentQuestion = getCurrentQuestion[1].ToString();
+            currentQuestion = getCurrentQuestion[0].ToString();
             questionBox.Text = currentQuestion;
         }
 
@@ -306,7 +137,6 @@ namespace button_practice
             else // default state // 標準状態
             {
                 SelectFile();
-                InitializeDataTable();
             }
         }
 
@@ -395,16 +225,8 @@ namespace button_practice
             }
         }
 
-
-
         private void Reset()
         {
-            // ensure connection is closed // 接続を確実に閉じる
-            if (_connection.State == ConnectionState.Open)
-            {
-                _connection.Close();
-            }
-
             // clear question // 質問を消去する
             questionBox.Text = string.Empty;
 
@@ -428,29 +250,10 @@ namespace button_practice
             UpdatePercentCorrectAnswers();
             correctPercentData.Text = string.Empty;
 
-            // clear loaded file and values from database
-            // 読み込んだファイルと値をデータベースから消去する
-            DeleteValuesFromDatabase();
-            loadedFileLabel.Text = string.Empty;
-
             // change file state // ファイルの状態を変更する
             isFileLoaded = false;
+            loadedFileLabel.Text = string.Empty;
         }
 
-        // clear database when application is closed
-        // アプリケーション終了時にデータベースを消去する
-        private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            if (_connection != null)
-            {
-                DeleteValuesFromDatabase();
-            }
-        }
-
-        private void Button1_Click(object sender, EventArgs e)
-        {
-            using SqlCredentialsForm form = new();
-            form.ShowDialog();
-        }
     }
 }
