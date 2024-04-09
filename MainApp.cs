@@ -29,7 +29,7 @@ namespace button_practice
             ofd.RestoreDirectory = true;
 
             // load .csv data to datatable
-            // 
+            // .csvデータをデータテーブルに入れる
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 string csvFilePath = ofd.FileName;
@@ -76,7 +76,7 @@ namespace button_practice
             string answer = questionRow[1].ToString().ToUpper();
 
             // check if user input matches the "English" answer
-            // ユーザー入力が "English "答えにマッチするかチェックする
+            // ユーザー入力が "English"答えにマッチするかチェックする
             if (answer == userAns)
             {
                 // if correct // 正解の場合

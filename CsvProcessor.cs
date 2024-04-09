@@ -18,13 +18,13 @@ namespace button_practice
             string[] headers = headerLine.Split(',');
 
             // add columns to datatable
-            // 
+            // データテーブルに欄を追加する
             foreach (string header in headers)
             {
                 dataTable.Columns.Add(header);
             }
             // add values to datatable
-            // 
+            // データテーブルに値を追加する
             while (!reader.EndOfStream)
             {
                 string[] values = reader.ReadLine().Split(",");
@@ -32,7 +32,7 @@ namespace button_practice
             }
 
             // check for specified column names and assigns them to the correct positions in the datatable
-            // 
+            // 指定されたカラム名をチェックし、データテーブルの正しい位置に割り当てる。
             DataColumn jpCol = dataTable.Columns.Cast<DataColumn>().FirstOrDefault(col => col.ColumnName.Equals("日本語", StringComparison.OrdinalIgnoreCase));
             DataColumn enCol = dataTable.Columns.Cast<DataColumn>().FirstOrDefault(col => col.ColumnName.Equals("英語", StringComparison.OrdinalIgnoreCase));
 
