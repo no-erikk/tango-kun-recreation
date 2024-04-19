@@ -200,6 +200,7 @@
             Controls.Add(answerBox);
             Controls.Add(reset_btn);
             Controls.Add(submit_btn);
+            FormBorderStyle = FormBorderStyle.FixedDialog;
             Name = "MainWindow";
             Text = "単語くん - YE版";
             ResumeLayout(false);
