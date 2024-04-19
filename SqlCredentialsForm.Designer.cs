@@ -207,6 +207,7 @@
             Controls.Add(port_label);
             Controls.Add(host_data);
             Controls.Add(host_label);
+            FormBorderStyle = FormBorderStyle.FixedDialog;
             Name = "SqlCredentialsForm";
             Text = "SQLサーバー情報";
             Load += SqlCredentialsForm_Load;
